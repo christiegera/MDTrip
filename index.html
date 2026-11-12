@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Maryland Scavenger Hunt</title>
+<style>
+  :root{
+    --paper:#f6efe1; --card:#fffaf0; --ink:#1f3a4d; --forest:#2f6b46; --pine:#1e4d33;
+    --sun:#f2a65a; --red:#c8453b; --sky:#9fd3e3; --line:#e6dac3;
+    --display: Rockwell, "Rockwell Extra Bold", "American Typewriter", "Roboto Slab", Georgia, serif;
+    --body: "Avenir Next", "Gill Sans", "Segoe UI", system-ui, sans-serif;
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth;scroll-padding-top:64px}
+  body{
+    margin:0; color:var(--ink); font-family:var(--body); font-size:16px; line-height:1.5;
+    background:
+      radial-gradient(circle at 20% 0%, #fff6e3 0, transparent 40%),
+      repeating-linear-gradient(0deg, transparent 0 38px, rgba(230,218,195,.45) 38px 39px),
+      var(--paper);
+    padding-bottom:72px;
+  }
+  .wrap{max-width:720px;margin:0 auto;padding:0 18px}
+
+  /* preview toolbar (hidden once live) */
+  .preview{
+    background:var(--ink);color:#fff;font-size:14px;padding:10px 18px;
+    display:flex;gap:12px;align-items:center;justify-content:space-between;flex-wrap:wrap;
+  }
+  .preview button{font:inherit;font-weight:700;background:var(--sun);color:var(--ink);border:0;border-radius:999px;padding:7px 14px;cursor:pointer}
+
+  /* hero */
+  header.hero{padding:26px 0 8px;text-align:center}
+  .hero svg{width:100%;max-width:520px;height:auto;display:block;margin:0 auto;filter:drop-shadow(0 10px 18px rgba(31,58,77,.18))}
+  .kicker{font-family:var(--display);color:var(--red);letter-spacing:.32em;font-weight:700;font-size:13px;margin:18px 0 4px}
+  h1{font-family:var(--display);font-weight:800;margin:0;line-height:.95;font-size:clamp(40px,11vw,68px);letter-spacing:.01em}
+  h1 span{display:block;color:var(--forest);font-size:.58em;letter-spacing:.06em;margin-top:6px}
+  .date{font-weight:700;letter-spacing:.2em;font-size:13px;opacity:.75;margin-top:10px}
+
+  /* team picker */
+  .team{
+    margin:22px 0 0;background:var(--card);border:2px solid var(--ink);border-radius:16px;
+    padding:14px 16px;box-shadow:4px 4px 0 var(--ink);
+  }
+  .team h2{font-family:var(--display);font-size:18px;margin:0 0 2px}
+  .team p{margin:0 0 10px;font-size:14px;opacity:.75}
+  .chips{display:flex;gap:8px;flex-wrap:wrap}
+  .chip{
+    font:inherit;font-weight:700;border:2px solid var(--ink);background:#fff;color:var(--ink);
+    border-radius:999px;padding:8px 16px;cursor:pointer;
+  }
+  .chip[aria-pressed="true"]{background:var(--forest);border-color:var(--forest);color:#fff}
+
+  /* rules */
+  .rules{margin:22px 0 0;padding:16px 18px;border-radius:16px;background:#fff;border:1.5px dashed var(--forest)}
+  .rules h2{font-family:var(--display);font-size:18px;margin:0 0 8px}
+  .rules ol{margin:0;padding-left:20px}
+  .rules li{margin:4px 0}
+  .rules .small{font-size:14px;opacity:.8;margin:10px 0 0}
+
+  /* stop nav */
+  nav.stops{
+    position:sticky;top:0;z-index:5;margin:22px -18px 0;padding:10px 18px;
+    background:rgba(246,239,225,.94);backdrop-filter:blur(6px);border-bottom:1.5px solid var(--line);
+    display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;
+  }
+  nav.stops::-webkit-scrollbar{display:none}
+  nav.stops a{
+    flex:0 0 auto;text-decoration:none;color:var(--ink);font-weight:700;font-size:14px;
+    padding:6px 12px;border-radius:999px;background:#fff;border:1.5px solid var(--line);
+  }
+
+  /* sections */
+  section.stop{margin-top:30px}
+  .stop-head{display:flex;align-items:baseline;gap:10px;border-bottom:3px solid var(--ink);padding-bottom:6px;margin-bottom:14px}
+  .stop-head h2{font-family:var(--display);font-size:24px;margin:0}
+  .stop-head .when{font-size:13px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--red)}
+
+  /* cards */
+  .card{
+    position:relative;background:var(--card);border:1.5px solid var(--line);border-radius:14px;
+    padding:16px 16px 14px 16px;margin:0 0 14px;box-shadow:0 2px 0 var(--line);
+    opacity:0;transform:translateY(10px);animation:rise .45s ease forwards;
+  }
+  @keyframes rise{to{opacity:1;transform:none}}
+  .card-top{display:flex;gap:12px;align-items:flex-start}
+  .num{
+    flex:0 0 auto;width:44px;height:44px;border-radius:50%;display:grid;place-items:center;
+    background:var(--ink);color:#fff;font-family:var(--display);font-weight:800;font-size:18px;
+  }
+  .card h3{margin:2px 0 0;font-size:18px;line-height:1.25}
+  .card h3 .em{margin-right:4px}
+  .pts{
+    margin-left:auto;flex:0 0 auto;font-weight:800;font-size:13px;white-space:nowrap;
+    background:var(--sun);color:var(--ink);border-radius:999px;padding:4px 10px;transform:rotate(3deg);
+  }
+  .mission{margin:10px 0 0}
+  .proof{margin:8px 0 0;font-size:14px}
+  .proof b{color:var(--forest)}
+  .heads{margin:8px 0 0;font-size:14px;background:#fdecdc;border-left:4px solid var(--red);padding:6px 10px;border-radius:0 8px 8px 0}
+  .go{
+    display:inline-flex;align-items:center;gap:6px;margin-top:12px;text-decoration:none;
+    font-weight:800;color:#fff;background:var(--forest);padding:10px 16px;border-radius:999px;
+    box-shadow:0 3px 0 var(--pine);
+  }
+  .go:active{transform:translateY(2px);box-shadow:0 1px 0 var(--pine)}
+  .go.off{background:#b9b2a3;box-shadow:none;pointer-events:none}
+
+  footer{text-align:center;margin:34px 0 0;font-size:14px;opacity:.75}
+  footer .big{font-family:var(--display);font-size:20px;opacity:1;color:var(--forest)}
+
+  @media print{
+    .preview,nav.stops,.team,.go{display:none!important}
+    .card{animation:none;opacity:1;transform:none;break-inside:avoid;box-shadow:none}
+    body{padding:0}
+    @page{size:letter portrait;margin:.5in}
+  }
+</style>
+</head>
+<body>
+
+<div class="preview" id="preview">
+  <span>Preview. Submit buttons are live and pre-fill team + challenge. Copy the code to host it.</span>
+  <button id="copy">Copy page code</button>
+</div>
+
+<div class="wrap">
+  <header class="hero">
+    <svg viewBox="600 40 950 370" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Maryland with mountains, a plane, a rocket and a flag">
+      <defs>
+        <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stop-color="#9fd3e3"/><stop offset=".65" stop-color="#ffe2b8"/><stop offset="1" stop-color="#f7c58b"/>
+        </linearGradient>
+        <clipPath id="md">
+          <path id="mdPath" d="M40 60 L830 60 L830 240 L960 240 L952 300 L940 340 L850 340 L780 345
+            L750 330 L762 270 L772 200 L782 130 L760 90 L742 150 L722 200 L702 250 L690 300 L700 370
+            L660 360 L600 320 L520 222 L500 200 L440 162 L380 150 L300 112 L232 74 L180 95 L120 110 L40 122 Z"/>
+        </clipPath>
+      </defs>
+      <g transform="translate(600 0) scale(0.97 1)">
+        <path d="M700 370 L690 300 L702 250 L722 200 L742 150 L760 90 L782 130 L772 200 L762 270 L750 330 L780 345 L760 400 L690 400 Z" fill="#8cc4d6"/>
+        <path d="M712 352 q8 -6 16 0 t16 0" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" opacity=".8"/>
+        <path d="M708 300 q8 -6 16 0 t16 0" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" opacity=".8"/>
+        <g clip-path="url(#md)">
+          <rect x="0" y="0" width="1000" height="400" fill="url(#sky)"/>
+          <circle cx="905" cy="290" r="34" fill="#f2a65a" opacity=".9"/>
+          <g fill="#fff"><circle cx="300" cy="80" r="2.5"/><circle cx="470" cy="75" r="2"/><circle cx="640" cy="90" r="2.5"/><circle cx="860" cy="85" r="2"/><circle cx="560" cy="70" r="1.8"/></g>
+          <polygon points="20,125 70,62 110,105 150,58 200,118 240,80 290,130" fill="#4f7f8f"/>
+          <polygon points="0,130 55,82 95,120 135,78 185,128" fill="#2f6b46"/>
+          <polygon points="70,62 82,77 62,80" fill="#fff" opacity=".85"/>
+          <polygon points="150,58 163,74 140,76" fill="#fff" opacity=".85"/>
+          <path d="M180 140 Q300 95 420 150 T660 170 L660 260 L180 260 Z" fill="#7fb069"/>
+          <path d="M300 170 Q430 130 560 200 T700 230 L700 400 L300 400 Z" fill="#2f6b46"/>
+          <path d="M780 250 Q860 215 980 255 L980 400 L780 400 Z" fill="#7fb069"/>
+          <g fill="#1e4d33">
+            <polygon points="250,150 262,118 274,150"/><polygon points="270,152 284,112 298,152"/>
+            <polygon points="460,190 472,160 484,190"/><polygon points="620,215 632,185 644,215"/>
+            <polygon points="800,262 812,232 824,262"/><polygon points="824,265 838,228 852,265"/>
+          </g>
+          <path d="M240 112 C300 70 360 75 410 90" fill="none" stroke="#1f3a4d" stroke-width="3" stroke-dasharray="6 8" stroke-linecap="round"/>
+          <g transform="translate(430 92) rotate(-8)">
+            <ellipse cx="0" cy="0" rx="34" ry="8" fill="#c8453b"/>
+            <polygon points="-6,-2 10,-2 -2,-28 -14,-28" fill="#1f3a4d"/>
+            <polygon points="-6,2 10,2 -2,26 -14,26" fill="#1f3a4d"/>
+            <polygon points="-30,-2 -22,-2 -30,-16 -36,-16" fill="#1f3a4d"/>
+            <circle cx="22" cy="-2" r="3" fill="#bfe0ea"/>
+          </g>
+          <g transform="translate(565 140)">
+            <path d="M-6 52 Q0 82 6 52 Z" fill="#f2a65a"/><path d="M-3 52 Q0 70 3 52 Z" fill="#ffe2b8"/>
+            <path d="M0 -50 C14 -32 14 20 12 50 L-12 50 C-14 20 -14 -32 0 -50 Z" fill="#fff" stroke="#1f3a4d" stroke-width="3"/>
+            <path d="M0 -50 C8 -40 10 -32 10.5 -26 L-10.5 -26 C-10 -32 -8 -40 0 -50 Z" fill="#c8453b"/>
+            <circle cx="0" cy="-6" r="6" fill="#9fd3e3" stroke="#1f3a4d" stroke-width="2.5"/>
+            <path d="M-12 30 L-24 54 L-12 50 Z" fill="#c8453b" stroke="#1f3a4d" stroke-width="2.5" stroke-linejoin="round"/>
+            <path d="M12 30 L24 54 L12 50 Z" fill="#c8453b" stroke="#1f3a4d" stroke-width="2.5" stroke-linejoin="round"/>
+          </g>
+          <g fill="#fff" opacity=".8"><circle cx="552" cy="226" r="9"/><circle cx="570" cy="230" r="11"/><circle cx="586" cy="224" r="8"/></g>
+          <g transform="translate(690 120)">
+            <rect x="-2" y="0" width="3.5" height="70" fill="#1f3a4d"/>
+            <g transform="translate(1.5 2)">
+              <rect width="46" height="28" fill="#fff"/>
+              <rect y="0" width="46" height="4" fill="#c8453b"/><rect y="8" width="46" height="4" fill="#c8453b"/>
+              <rect y="16" width="46" height="4" fill="#c8453b"/><rect y="24" width="46" height="4" fill="#c8453b"/>
+              <rect width="20" height="16" fill="#1f3a4d"/>
+              <g fill="#fff"><circle cx="5" cy="5" r="1.4"/><circle cx="11" cy="5" r="1.4"/><circle cx="16" cy="5" r="1.4"/><circle cx="8" cy="11" r="1.4"/><circle cx="14" cy="11" r="1.4"/></g>
+            </g>
+            <polygon points="0,72 14,64 22,76 8,84 -10,82 -16,70" fill="#a4683f" stroke="#1f3a4d" stroke-width="2"/>
+          </g>
+          <g transform="translate(520 300)">
+            <polygon points="-24,20 0,-14 24,20" fill="#f2a65a" stroke="#1f3a4d" stroke-width="2.5" stroke-linejoin="round"/>
+            <polygon points="-6,20 0,4 6,20" fill="#1f3a4d"/>
+          </g>
+        </g>
+        <use href="#mdPath" fill="none" stroke="#1f3a4d" stroke-width="6" stroke-linejoin="round"/>
+        <g transform="translate(728 378)">
+          <path d="M-12 0 L12 0 L8 7 L-8 7 Z" fill="#1f3a4d"/>
+          <path d="M0 -2 L0 -24 L12 -2 Z" fill="#fff" stroke="#1f3a4d" stroke-width="2"/>
+        </g>
+      </g>
+    </svg>
+    <div class="kicker">TROOP 13 PRESENTS</div>
+    <h1>Maryland<span>Scavenger Hunt</span></h1>
+    <div class="date">NOVEMBER 13–15, 2026</div>
+  </header>
+
+  <div class="team" id="teamBox">
+    <h2>Uploaders: which team are you?</h2>
+    <p>Pick once. Your team fills in automatically every time you tap Submit.</p>
+    <div class="chips" id="chips"></div>
+  </div>
+
+  <div class="rules">
+    <h2>How to play</h2>
+    <ol>
+      <li>Do the challenge as a team. Everyone plays.</li>
+      <li>Your team's <b>uploader</b> taps <b>Submit</b> on that challenge. The form opens with the challenge already picked.</li>
+      <li>Add your photo or video and hit submit. Then come back for the next one.</li>
+    </ol>
+    <p class="small">Videos under 15 seconds unless the challenge says otherwise. No signal? Shoot it now, upload later. Deadlines: Friday and Saturday at lights-out, Sunday when we leave Fort McHenry. Scores are revealed along the way. Final scores and the winner on Sunday. 🏆</p>
+  </div>
+
+  <nav class="stops" id="nav"></nav>
+  <main id="list"></main>
+
+  <footer>
+    <div class="big">Have fun. Be safe. Be kind.</div>
+    Questions about a challenge? Ask a leader. Their call is final.
+  </footer>
+</div>
+
+<script>
+const STOPS = [
+  {id:'camp',     name:'Camp',            when:'Friday + all weekend', nav:'🏕️ Camp'},
+  {id:'aviation', name:'College Park Aviation Museum', when:'Saturday morning', nav:'✈️ Aviation'},
+  {id:'lunch',    name:'Lunch',           when:'Saturday', nav:'🥪 Lunch'},
+  {id:'goddard',  name:'NASA Goddard Visitor Center', when:'Saturday afternoon', nav:'🚀 Goddard'},
+  {id:'dinner',   name:'Dinner at Camp',  when:'Saturday night', nav:'🍝 Dinner'},
+  {id:'fort',     name:'Fort McHenry',    when:'Sunday morning', nav:'🇺🇸 Fort'},
+  {id:'bonus',    name:'Bonus',           when:'Any time', nav:'⭐ Bonus'},
+];
+
+const CH = [
+  {n:1, s:'camp', e:'🏕️', t:'Any Greenbelt Park sign', p:'5',
+   m:'Snap your whole team with any Greenbelt Park sign: bathroom, campsite number, trail marker or map board.',
+   pr:'Photo. Every team member visible.'},
+  {n:2, s:'camp', e:'⛺', t:'Help a scout with their tent', p:'15',
+   m:'Someone on your team helps a scout who is having trouble setting up their tent. Teach them, don’t take over.',
+   pr:'Photo of the helping in action.',
+   h:'This is not a race. Quiet hours start at 10 PM.'},
+  {n:3, s:'aviation', e:'🛩️', t:'The oldest aircraft', p:'10',
+   m:'Find the oldest aircraft in the museum. Write its year on paper (or a hand) and hold it up next to the plane.',
+   pr:'Photo with the plane and the year both visible.'},
+  {n:4, s:'aviation', e:'🤫', t:'Recreate the first flight', p:'15',
+   m:'Recreate the Wright brothers’ first powered flight from 1903. You need a pilot, a plane and a cheering crowd.',
+   pr:'Video, up to 10 seconds.',
+   h:'Quiet voices, no running, stay out of other visitors’ way. A quiet corner or outside works best.'},
+  {n:5, s:'aviation', e:'🛫', t:'A real plane', p:'10',
+   m:'The museum sits on College Park Airport, the oldest continuously operating airport in the world. Catch a real plane taking off or landing.',
+   pr:'Photo or video with the plane visible.',
+   h:'Planes don’t run on a schedule, so keep your eyes open. Stay behind the fences.'},
+  {n:6, s:'aviation', e:'🧭', t:'Something a pilot needs', p:'5',
+   m:'Find anything a pilot would need or use: goggles, a map, a propeller, an instrument, you decide.',
+   pr:'Photo, plus one sentence in the notes box about why a pilot needs it.'},
+  {n:7, s:'lunch', e:'🧹', t:'Cleaned up first', p:'10',
+   m:'Be the first team with your lunch area completely cleaned up: trash gone, table wiped, gear packed.',
+   pr:'Photo of your clean spot. Fastest submission wins, and leaders will check.'},
+  {n:8, s:'goddard', e:'🚀', t:'Rocket Garden launch', p:'10',
+   m:'Whole team poses in the Rocket Garden like you’re blasting off.',
+   pr:'Photo with a real rocket in the shot.'},
+  {n:9, s:'goddard', e:'🌡️', t:'See yourself in infrared', p:'10',
+   m:'At the James Webb exhibit, get your whole team on the infrared camera.',
+   pr:'Photo of the screen with your team in infrared.'},
+  {n:10, s:'goddard', e:'🔭', t:'Explain Webb', p:'15',
+   m:'One scout explains what the James Webb Space Telescope does in under 20 seconds. Hint: it was built right here at Goddard.',
+   pr:'Video. Up to 20 seconds is OK for this one.'},
+  {n:11, s:'goddard', e:'👃', t:'Smell the solar system', p:'10',
+   m:'Find the exhibit where you can smell things from space. Film your team’s reactions.',
+   pr:'Video of the faces. The bigger the reaction, the better.'},
+  {n:12, s:'goddard', e:'🧑‍🔬', t:'The secret staff fact', p:'20',
+   m:'Politely ask a staff member for one fact that isn’t on any sign. Then a scout recites it on camera.',
+   pr:'Video of the scout reciting the fact.',
+   h:'Say thank you! Film the scout, not the staff member.'},
+  {n:13, s:'dinner', e:'🍝', t:'Chef at work', p:'5',
+   m:'Your team’s chef stirring the spaghetti on the propane stove.',
+   pr:'Photo.',
+   h:'Safe cooking first. Follow the adults’ stove rules.'},
+  {n:14, s:'dinner', e:'🍽️', t:'Restaurant plating', p:'10 · judged',
+   m:'Plate your spaghetti (meat sauce or butter) and apples like it’s a fancy restaurant. Apple-slice art counts.',
+   pr:'Photo of the plate. Leaders judge.'},
+  {n:15, s:'dinner', e:'🧽', t:'DISH RACE', p:'25 / 10',
+   m:'Dishes washed, dried and put away. The first team done gets 25 points. The second team gets 10, but only if it’s done right.',
+   pr:'Photo of your clean, packed dish kit.',
+   h:'Adults inspect before points count. A greasy pot means you’re not done.'},
+  {n:16, s:'fort', e:'🇺🇸', t:'Help raise the flag', p:'25',
+   m:'Help the rangers raise the giant garrison flag at the flag change.',
+   pr:'Photo of your team with hands on the flag.',
+   h:'The flag change is cancelled in rain or bad wind. If that happens, leaders will announce a swap challenge.'},
+  {n:17, s:'fort', e:'📜', t:'The Star-Spangled Banner story', p:'10',
+   m:'Find where the story of the Star-Spangled Banner is told at the fort.',
+   pr:'Photo, plus one fact you learned in the notes box.'},
+  {n:18, s:'fort', e:'🎤', t:'Sing it', p:'10',
+   m:'Whole team sings the first line of the national anthem.',
+   pr:'Video.',
+   h:'Sing it respectfully. Hats off.'},
+  {n:19, s:'bonus', e:'🤝', t:'Good Turn', p:'15',
+   m:'Catch a teammate doing a Good Turn, helping someone without being asked.',
+   pr:'Photo, plus what they did in the notes box.'},
+  {n:20, s:'bonus', e:'📷', t:'Best team photo of the weekend', p:'20 · judged',
+   m:'Your single best team photo from the whole trip. Submit just one.',
+   pr:'Photo. Leaders pick the winner Sunday.'},
+  {n:21, s:'bonus', e:'🦘', t:'Mid-air jump', p:'10',
+   m:'Every team member in the air at the same time, in one shot.',
+   pr:'Photo. All feet off the ground!'},
+];
+
+const FORM_LINK = 'https://forms.gle/kkFSiZvE6TUJQtgq6';
+
+// Copied from the form's pre-filled link. Choice text must match the form exactly.
+const info = {
+  base: 'https://docs.google.com/forms/d/e/1FAIpQLSca600eI3ZpiTR1NByh8PbyHdCzHYmGUMY9R2VPtokWX6Az3w/viewform',
+  teamEntry: '1214011166',
+  challengeEntry: '1436932647',
+  teams: ['Team 1', 'Team 2'],
+  challenges: [
+    '1 – Any Greenbelt Park sign (5 pts)',
+    '2 – Helping a scout who is struggling with their tent (15 pts)',
+    '3 – Oldest aircraft + its year (10 pts)',
+    '4 – Wright brothers first flight (quietly!) (15 pts)',
+    '5 – Real plane taking off or landing (10 pts)',
+    '6 – Something a pilot would need or use (5 pts)',
+    '7 – Lunch area cleaned up first (10 pts)',
+    '8 – Rocket Garden launch pose (10 pts)',
+    '9 – Team in infrared at Webb exhibit (10 pts)',
+    '10 – Scout explains Webb in under 20 sec (15 pts)',
+    '11 – Smell a solar system object (10 pts)',
+    '12 – Staff fact, recited by a scout (20 pts)',
+    '13 – Chef stirring the spaghetti (5 pts)',
+    '14 – Restaurant-style plating (10 pts)',
+    '15 – DISH RACE (25 first / 10 second) (25 pts)',
+    '16 – Helping with the flag change (25 pts)',
+    '17 – Star-Spangled Banner story + fact (10 pts)',
+    '18 – National anthem first line (10 pts)',
+    '19 – Good Turn (15 pts)',
+    '20 – Best team photo of the weekend (20 pts)',
+    '21 – Whole team mid-air jump photo (10 pts)',
+  ],
+};
+let team = null;
+try { team = localStorage.getItem('mdhunt-team'); } catch (e) {}
+
+function link(n) {
+  const choice = info.challenges.find(c => c.startsWith(n + ' –'));
+  if (!choice) return FORM_LINK;
+  let url = info.base + '?usp=pp_url&entry.' + info.challengeEntry + '=' + encodeURIComponent(choice);
+  if (team && info.teams.includes(team)) url += '&entry.' + info.teamEntry + '=' + encodeURIComponent(team);
+  return url;
+}
+
+function render() {
+  document.getElementById('nav').innerHTML =
+    STOPS.map(s => `<a href="#${s.id}">${s.nav}</a>`).join('');
+  let i = 0;
+  document.getElementById('list').innerHTML = STOPS.map(s => {
+    const cards = CH.filter(c => c.s === s.id).map(c => {
+      const url = link(c.n);
+      const btn = url
+        ? `<a class="go" href="${url}" target="_blank" rel="noopener">Submit #${c.n} →</a>`
+        : `<span class="go off">Submit #${c.n} →</span>`;
+      return `<article class="card" style="animation-delay:${(i++) * 35}ms">
+        <div class="card-top">
+          <div class="num">${c.n}</div>
+          <h3><span class="em">${c.e}</span>${c.t}</h3>
+          <div class="pts">${c.p} pts</div>
+        </div>
+        <p class="mission">${c.m}</p>
+        <p class="proof"><b>Proof:</b> ${c.pr}</p>
+        ${c.h ? `<p class="heads">⚠️ ${c.h}</p>` : ''}
+        ${btn}
+      </article>`;
+    }).join('');
+    return `<section class="stop" id="${s.id}">
+      <div class="stop-head"><h2>${s.name}</h2><span class="when">${s.when}</span></div>
+      ${cards}
+    </section>`;
+  }).join('');
+}
+
+function renderTeams(teams) {
+  document.getElementById('chips').innerHTML = teams.map(t =>
+    `<button class="chip" aria-pressed="${t === team}" data-team="${t.replace(/"/g, '&quot;')}">${t}</button>`
+  ).join('');
+  document.querySelectorAll('.chip').forEach(b => b.addEventListener('click', () => {
+    team = b.dataset.team;
+    try { localStorage.setItem('mdhunt-team', team); } catch (e) {}
+    renderTeams(teams);
+    render();
+  }));
+}
+
+render();
+renderTeams(info.teams);
+
+// The preview bar only shows inside Dia, not once the page is hosted
+if (!/dia-artifacts|^file:/.test(location.href)) {
+  document.getElementById('preview').remove();
+} else {
+  document.getElementById('copy').addEventListener('click', async e => {
+    const b = e.currentTarget;
+    try {
+      const html = await (await fetch(location.href, {cache: 'no-store'})).text();
+      await navigator.clipboard.writeText(html);
+      b.textContent = 'Copied!';
+    } catch (err) {
+      b.textContent = 'Copy failed. Ask Dia for the code';
+    }
+  });
+}
+</script>
+</body>
+</html>
