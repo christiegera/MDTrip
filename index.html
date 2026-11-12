@@ -238,12 +238,24 @@ const STOPS = [
 
 const CH = [
   {n:1, s:'camp', e:'🏕️', t:'Any Greenbelt Park sign', p:'5',
-   m:'Snap your whole team with any Greenbelt Park sign: bathroom, campsite number, trail marker or map board.',
+   m:'Take a photo of your whole team with any Greenbelt Park sign: bathroom, campsite number, trail marker or map board.',
    pr:'Photo. Every team member visible.'},
   {n:2, s:'camp', e:'⛺', t:'Help a scout with their tent', p:'15',
    m:'Someone on your team helps a scout who is having trouble setting up their tent. Teach them, don’t take over.',
    pr:'Photo of the helping in action.',
    h:'This is not a race. Quiet hours start at 10 PM.'},
+  {n:22, s:'camp', e:'🦌', t:'Wildlife spotter', p:'10',
+   m:'Spot a deer, chipmunk, squirrel or bird in the park. Deer and chipmunks are common here.',
+   pr:'Photo with the animal visible.',
+   h:'Keep your distance and don’t feed anything. Your best chance is in daylight: Saturday or Sunday morning.'},
+  {n:23, s:'camp', e:'🪢', t:'Knot challenge', p:'20 · most knots',
+   m:'Tie as many different knots as you can, up to 5. One video per knot. At least two different scouts have to tie them.',
+   pr:'Up to 5 videos in one submission, one knot per video. The team with the most correctly tied knots wins.',
+   h:'This is not a race. Leaders check that each knot is tied right.'},
+  {n:24, s:'camp', e:'🎯', t:'Trick shot', p:'15 · judged',
+   m:'Pull off a trick shot using camp gear: a water bottle flip, a pinecone into a bucket, anything that’s safe.',
+   pr:'Video of the shot landing. Leaders pick the best one.',
+   h:'Nothing that can break, burn or hit someone.'},
   {n:3, s:'aviation', e:'🛩️', t:'The oldest aircraft', p:'10',
    m:'Find the oldest aircraft in the museum. Write its year on paper (or a hand) and hold it up next to the plane.',
    pr:'Photo with the plane and the year both visible.'},
@@ -308,6 +320,10 @@ const CH = [
   {n:21, s:'bonus', e:'🦘', t:'Mid-air jump', p:'10',
    m:'Every team member in the air at the same time, in one shot.',
    pr:'Photo. All feet off the ground!'},
+  {n:25, s:'bonus', e:'📸', t:'Whole troop photo', p:'20 · both teams',
+   m:'One photo with EVERYONE on the trip: every scout and every leader. Work together to round people up. You can’t earn this one alone.',
+   pr:'Photo with every person visible. Each team submits it to get the points.',
+   h:'Ask a stranger or use a timer so nobody has to be left out to take it.'},
 ];
 
 const FORM_LINK = 'https://forms.gle/kkFSiZvE6TUJQtgq6';
@@ -340,6 +356,10 @@ const info = {
     '19 – Good Turn (15 pts)',
     '20 – Best team photo of the weekend (20 pts)',
     '21 – Whole team mid-air jump photo (10 pts)',
+    '22 – Wildlife spotter (10 pts)',
+    '23 – Knot challenge (20 pts)',
+    '24 – Trick shot (15 pts)',
+    '25 – Whole troop photo (20 pts)',
   ],
 };
 let team = null;
