@@ -216,7 +216,7 @@
       <li>Your team's <b>uploader</b> taps <b>Submit</b> on that challenge. The form opens with the challenge already picked.</li>
       <li>Add your photo or video and hit submit. Then come back for the next one.</li>
     </ol>
-    <p class="small">Videos under 15 seconds unless the challenge says otherwise. No signal? Shoot it now, upload later. Deadlines: Friday and Saturday at lights-out, Sunday when we leave Fort McHenry. Scores are revealed along the way. Final scores and the winner on Sunday. 🏆</p>
+    <p class="small">Videos under 15 seconds unless the challenge says otherwise. No signal? Shoot it now, upload later. Deadlines: Friday and Saturday at lights-out, Sunday before we head home. Nothing happens at the museums: those are just for exploring. Scores are revealed along the way. Final scores and the winner on Sunday. 🏆</p>
   </div>
 
   <nav class="stops" id="nav"></nav>
@@ -231,11 +231,8 @@
 <script>
 const STOPS = [
   {id:'camp',     name:'Camp',            when:'Friday + all weekend', nav:'🏕️ Camp'},
-  {id:'aviation', name:'College Park Aviation Museum', when:'Saturday morning', nav:'✈️ Aviation'},
   {id:'lunch',    name:'Lunch',           when:'Saturday', nav:'🥪 Lunch'},
-  {id:'goddard',  name:'NASA Goddard Visitor Center', when:'Saturday afternoon', nav:'🚀 Goddard'},
   {id:'dinner',   name:'Dinner at Camp',  when:'Saturday night', nav:'🍝 Dinner'},
-  {id:'fort',     name:'Fort McHenry',    when:'Sunday morning', nav:'🇺🇸 Fort'},
   {id:'bonus',    name:'Bonus',           when:'Any time', nav:'⭐ Bonus'},
 ];
 
@@ -364,12 +361,12 @@ function render() {
     const cards = CH.filter(c => c.s === s.id).map(c => {
       const url = link(c.n);
       const btn = url
-        ? `<a class="go" href="${url}" target="_blank" rel="noopener">Submit #${c.n} →</a>`
-        : `<span class="go off">Submit #${c.n} →</span>`;
+        ? `<a class="go" href="${url}" target="_blank" rel="noopener">Submit →</a>`
+        : `<span class="go off">Submit →</span>`;
       return `<article class="card" style="animation-delay:${(i++) * 35}ms">
         <div class="card-top">
-          <div class="num">${c.n}</div>
-          <h3><span class="em">${c.e}</span>${c.t}</h3>
+          <div class="num">${c.e}</div>
+          <h3>${c.t}</h3>
           <div class="pts">${c.p} pts</div>
         </div>
         <p class="mission">${c.m}</p>
